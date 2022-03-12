@@ -15,9 +15,13 @@ func main() {
 	cfg := Config{}
 
 	// Establish dependencies for handlers
-	application := &application{
+	loggers := loggers{
 		infoLogger: InfoLogger,
 		errorLogger: ErrorLogger,
+	}
+
+	application := &application{
+		loggers: loggers,
 	}
 
 	// Parse configurations for the application
@@ -28,9 +32,9 @@ func main() {
 	srv := &http.Server{
 		Addr:    fmt.Sprintf("%s:%s", cfg.Addr, cfg.Port),
 		Handler: application.routes(),
-		ErrorLog: application.errorLogger,
+		ErrorLog: application.loggers.errorLogger,
 	}
 
-	application.infoLogger.Printf("Starting server %s:%s", cfg.Addr, cfg.Port)
-	application.errorLogger.Fatal(srv.ListenAndServe())
+	application.loggers.infoLogger.Printf("Starting server %s:%s", cfg.Addr, cfg.Port)
+	application.loggers.errorLogger.Fatal(srv.ListenAndServe())
 }
