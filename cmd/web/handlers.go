@@ -14,7 +14,7 @@ type PageData struct {
 
 var fileServer = http.FileServer(http.Dir("./ui/static"))
 
-func (app *application)home(w http.ResponseWriter, r *http.Request) {
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.clientError(w, http.StatusNotFound)
 		return
@@ -39,7 +39,7 @@ func (app *application)home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application)showSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	fmt.Printf("id: %d, err: %v\n", id, err)
 
@@ -55,7 +55,7 @@ func (app *application)showSnippet(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application)createSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		// w.WriteHeader(http.StatusMethodNotAllowed)

@@ -1,13 +1,16 @@
 package main
 
-import "log"
+import (
+	"database/sql"
+	"log"
+)
 
 type loggers struct {
-	infoLogger *log.Logger
+	infoLogger  *log.Logger
 	errorLogger *log.Logger
 }
 
 type application struct {
-	loggers loggers
+	loggers *loggers
+	db      *sql.DB
 }
-

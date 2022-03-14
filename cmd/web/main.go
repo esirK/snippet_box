@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Config struct {
@@ -14,14 +17,21 @@ type Config struct {
 func main() {
 	cfg := Config{}
 
+	db, err := openDB("snippet:snippet@/snippetbox?parseTime=true")
+
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 	// Establish dependencies for handlers
 	loggers := loggers{
-		infoLogger: InfoLogger,
+		infoLogger:  InfoLogger,
 		errorLogger: ErrorLogger,
 	}
 
 	application := &application{
-		loggers: loggers,
+		loggers: &loggers,
+		db:      db,
 	}
 
 	// Parse configurations for the application
@@ -30,11 +40,24 @@ func main() {
 	flag.Parse()
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf("%s:%s", cfg.Addr, cfg.Port),
-		Handler: application.routes(),
+		Addr:     fmt.Sprintf("%s:%s", cfg.Addr, cfg.Port),
+		Handler:  application.routes(),
 		ErrorLog: application.loggers.errorLogger,
 	}
 
 	application.loggers.infoLogger.Printf("Starting server %s:%s", cfg.Addr, cfg.Port)
 	application.loggers.errorLogger.Fatal(srv.ListenAndServe())
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
