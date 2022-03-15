@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/esirk/snippet_box/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -29,9 +30,13 @@ func main() {
 		errorLogger: ErrorLogger,
 	}
 
+	snippetModel := mysql.SnippetModel{
+		DB: db,
+	}
+
 	application := &application{
-		loggers: &loggers,
-		db:      db,
+		loggers:  &loggers,
+		snippets: &snippetModel,
 	}
 
 	// Parse configurations for the application

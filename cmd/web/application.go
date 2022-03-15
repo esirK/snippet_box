@@ -1,8 +1,9 @@
 package main
 
 import (
-	"database/sql"
 	"log"
+
+	"github.com/esirk/snippet_box/pkg/models/mysql"
 )
 
 type loggers struct {
@@ -11,6 +12,6 @@ type loggers struct {
 }
 
 type application struct {
-	loggers *loggers
-	db      *sql.DB
+	loggers  *loggers
+	snippets *mysql.SnippetModel
 }

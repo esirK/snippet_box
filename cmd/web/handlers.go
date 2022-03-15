@@ -1,10 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"text/template"
+
+	"github.com/esirk/snippet_box/pkg/models"
 )
 
 type PageData struct {
@@ -44,14 +48,20 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("id: %d, err: %v\n", id, err)
 
 	if id < 1 && err != nil {
-		w.Write([]byte("Showing all snippets"))
+		snippets, _ := app.snippets.Latest()
+		var dat string
+		for _, s := range snippets {
+			dat += fmt.Sprintf("%s\n", s.Content)
+		}
+		w.Write([]byte(dat))
 		return
 	}
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	} else {
-		fmt.Fprintf(w, "Showing snippet: %d", id)
+		snippet, _ := app.snippets.Get(id)
+		fmt.Fprintf(w, "%v", snippet)
 	}
 }
 
@@ -63,5 +73,21 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	w.Write([]byte("Create a new snippet"))
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	var snippet models.Snippet
+	if err := json.Unmarshal(data, &snippet); err != nil {
+		app.serverError(w, err)
+		return
+	}
+	id, err := app.snippets.Insert(&snippet)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	// redirect to new snippet
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
 }
