@@ -1,0 +1,37 @@
+{{template "base" .}}
+{{define "title"}}Snippet #{{.ID}}{{end}}
+
+{{define "body"}}
+    <div class="flex flex-col space-y-4">
+        <div class="py-4 px-3 rounded-xl shadow-lg space-y-2 divide-y-2">
+            <div class="flex items-center text-right justify-between bg-slate-300 rounded px-1">
+                <h1 class="text-lg text-black font-semibold">{{.Title}}</h1>
+                <span class="text-sm text-gray-600">#{{.ID}}</span>
+            </div>
+            <div class="content divide-y-2 divide-yellow-400">
+                <div class="py-4">
+                    <p>{{.Content}}</p>
+                </div>
+                <div class="metadata flex items-center space-x-2 justify-between">
+                    <time class="text-xs text-gray-600">Created: {{.Created}}</time>
+                    <time class="text-xs text-gray-600">Expires: {{.Expires}}</time>
+                </div>
+            </div>
+        </div>
+         <div class="py-4 px-3 rounded-xl shadow-lg space-y-2 divide-y-2">
+            <div class="flex items-center text-right justify-between bg-slate-300 rounded px-1">
+                <h1 class="text-lg text-black font-semibold">{{.Title}}</h1>
+                <span class="text-sm text-gray-600">#{{.ID}}</span>
+            </div>
+            <div class="content divide-y-2 divide-yellow-400">
+                <div class="py-4">
+                    <p>{{.Content}}</p>
+                </div>
+                <div class="metadata flex items-center space-x-2 justify-between">
+                    <time class="text-xs text-gray-600">Created: {{.Created}}</time>
+                    <time class="text-xs text-gray-600">Expires: {{.Expires}}</time>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
