@@ -29,6 +29,9 @@ func (m *SnippetModel) Get(id int) (*models.Snippet, error) {
 	var snippet = &models.Snippet{}
 	err := m.DB.QueryRow("SELECT id, title, content, created, expires FROM snippets WHERE id = ?", id).Scan(&snippet.ID, &snippet.Title, &snippet.Content, &snippet.Created, &snippet.Expires)
 	if err != nil {
+		if err == sql.ErrNoRows{
+			return nil, &models.ErrNoRecord{}
+		}
 		return nil, err
 	}
 	return snippet, nil

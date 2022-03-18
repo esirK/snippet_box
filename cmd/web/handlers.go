@@ -20,7 +20,7 @@ var fileServer = http.FileServer(http.Dir("./ui/static"))
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		app.clientError(w, http.StatusNotFound)
+		app.clientError(w, http.StatusNotFound, nil)
 		return
 	}
 	data := PageData{
@@ -45,23 +45,58 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	fmt.Printf("id: %d, err: %v\n", id, err)
-
-	if id < 1 && err != nil {
-		snippets, _ := app.snippets.Latest()
-		var dat string
-		for _, s := range snippets {
-			dat += fmt.Sprintf("%s\n", s.Content)
-		}
-		w.Write([]byte(dat))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusBadRequest, &models.ClientError{
+			Message: "ID must be a positive integer",
+		})
 		return
 	}
-	if err != nil || id < 1 {
-		app.clientError(w, http.StatusBadRequest)
+	files := []string{
+		"ui/html/show.page.tmpl",
+		"ui/html/base.layout.tmpl",
+		"ui/html/footer.partial.tmpl",
+	}
+	tmpl, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
 		return
-	} else {
-		snippet, _ := app.snippets.Get(id)
-		fmt.Fprintf(w, "%v", snippet)
+	}
+
+	snippet, err := app.snippets.Get(id)
+	if err != nil {
+		switch err.(type) {
+			case *models.ErrNoRecord:
+				app.clientError(w, http.StatusNotFound, &models.ClientError{
+					Message: "Snippet not found",
+				})
+				return
+			default:
+				app.serverError(w, err)
+		}
+		return
+	}
+	err = tmpl.Execute(w, snippet)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
+func (app *application)showAllSnippets(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"ui/html/show.page.tmpl",
+		"ui/html/base.layout.tmpl",
+		"ui/html/footer.partial.tmpl",
+	}
+
+	tmpl, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	snippets, _ := app.snippets.Latest()
+	err = tmpl.Execute(w, snippets)
+	if err != nil {
+		app.serverError(w, err)
 	}
 }
 
@@ -70,7 +105,7 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Allow", http.MethodPost)
 		// w.WriteHeader(http.StatusMethodNotAllowed)
 		// w.Write([]byte("Method not allowed"))
-		app.clientError(w, http.StatusMethodNotAllowed)
+		app.clientError(w, http.StatusMethodNotAllowed, nil)
 		return
 	}
 	data, err := ioutil.ReadAll(r.Body)
