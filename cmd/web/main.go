@@ -40,8 +40,8 @@ func main() {
 	}
 
 	// Parse configurations for the application
-	flag.StringVar(&cfg.Addr, "server_id", "0.0.0.0", "server address for witch to listen on")
-	flag.StringVar(&cfg.Port, "port", "5555", "server port for witch to listen on")
+	flag.StringVar(&cfg.Addr, "server_id", "0.0.0.0", "server address for which to listen on")
+	flag.StringVar(&cfg.Port, "port", "5555", "server port for which to listen on")
 	flag.Parse()
 
 	srv := &http.Server{
