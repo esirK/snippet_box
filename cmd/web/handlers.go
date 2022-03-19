@@ -21,6 +21,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	files := []string{
 		"ui/html/home.page.tmpl",
+		"ui/html/show.snippets.tmpl",
+		"ui/html/no-snippets.tmpl",
 		"ui/html/base.layout.tmpl",
 		"ui/html/footer.partial.tmpl",
 	}
@@ -29,7 +31,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	if err = tmpl.Execute(w, nil); err != nil {
+
+	snippets, _ := app.snippets.Latest()
+	data := SnippetsData{
+		Snippets: snippets,
+	}
+	if err = tmpl.Execute(w, data); err != nil {
 		app.serverError(w, err)
 		return
 	}
@@ -57,40 +64,18 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	snippet, err := app.snippets.Get(id)
 	if err != nil {
 		switch err.(type) {
-			case *models.ErrNoRecord:
-				app.clientError(w, http.StatusNotFound, &models.ClientError{
-					Message: "Snippet not found",
-				})
-				return
-			default:
-				app.serverError(w, err)
+		case *models.ErrNoRecord:
+			app.clientError(w, http.StatusNotFound, &models.ClientError{
+				Message: "Snippet not found",
+			})
+			return
+		default:
+			app.serverError(w, err)
 		}
 		return
 	}
 	data := SnippetData{
 		Snippet: snippet,
-	}
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-	}
-}
-
-func (app *application)showAllSnippets(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"ui/html/show.snippets.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partial.tmpl",
-	}
-
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	snippets, _ := app.snippets.Latest()
-	data := SnippetsData{
-		Snippets: snippets,
 	}
 	err = tmpl.Execute(w, data)
 	if err != nil {

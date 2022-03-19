@@ -3,6 +3,9 @@
 {{ define "title" }} Home - Snippents {{ end }}
 
 {{ define "body" }}
-<h1 class="text-lg font-bold">Latest Snippents</h1>
-<p>No Snippents for now</p>
+    {{ if len .Snippets }}
+        {{ template "snippets" . }}
+    {{ else }}
+        {{ template "no-snippets" . }}
+    {{ end }}
 {{ end }}
