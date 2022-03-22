@@ -22,6 +22,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"ui/html/home.page.tmpl",
 		"ui/html/show.snippets.tmpl",
+		"ui/html/snippet.tmpl",
 		"ui/html/no-snippets.tmpl",
 		"ui/html/base.layout.tmpl",
 		"ui/html/footer.partial.tmpl",
@@ -51,7 +52,8 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	files := []string{
-		"ui/html/show.page.tmpl",
+		"ui/html/show.snippet.tmpl",
+		"ui/html/snippet.tmpl",
 		"ui/html/base.layout.tmpl",
 		"ui/html/footer.partial.tmpl",
 	}
