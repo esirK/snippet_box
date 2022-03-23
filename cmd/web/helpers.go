@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 
 	"github.com/esirk/snippet_box/pkg/models"
 )
@@ -22,6 +24,15 @@ func (app *application) clientError(w http.ResponseWriter, status int, err *mode
 	http.Error(w, http.StatusText(status), status)
 }
 
+func (app *application) addDefaultYear(td *templateData)*templateData {
+	if td == nil {
+		td = &templateData{}
+	}
+	td.CurrentYear = time.Now().Year()
+	return td
+}
+
+
 func (app *application) render(w http.ResponseWriter, name string, td *templateData){
 	// retrieve appropriate template from cache
 	ts, ok := app.templateCache[name]
@@ -29,8 +40,11 @@ func (app *application) render(w http.ResponseWriter, name string, td *templateD
 		app.serverError(w, fmt.Errorf("template %s not found", name))
 		return
 	}
-	err := ts.Execute(w, td)
+	buf := new(bytes.Buffer)
+
+	err := ts.Execute(buf, app.addDefaultYear(td))
 	if err != nil {
 		app.serverError(w, err)
 	}
+	buf.WriteTo(w)
 }

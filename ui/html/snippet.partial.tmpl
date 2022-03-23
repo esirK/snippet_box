@@ -9,8 +9,8 @@
             <p>{{.Content}}</p>
         </div>
         <div class="metadata flex items-center space-x-2 justify-between">
-            <time class="text-xs text-gray-600">Created: {{.Created}}</time>
-            <time class="text-xs text-gray-600">Expires: {{.Expires}}</time>
+            <time class="text-xs text-gray-600">Created: {{humanDate .Created}}</time>
+            <time class="text-xs text-gray-600">Expires: {{humanDate .Expires}}</time>
         </div>
     </div>
 </div>
