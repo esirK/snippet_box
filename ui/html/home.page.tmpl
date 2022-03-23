@@ -3,7 +3,7 @@
 {{ define "title" }} Home - Snippents {{ end }}
 
 {{ define "body" }}
-    {{ if len .Snippets }}
+    {{ if .Snippets }}
         {{ template "snippets" . }}
     {{ else }}
         {{ template "no-snippets" . }}

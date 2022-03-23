@@ -3,6 +3,8 @@
 
 {{define "body"}}
     <div class="flex flex-col space-y-4">
-        {{ template "snippet" .Snippet }}
+        {{with .Snippet}}
+            {{ template "snippet" . }}
+        {{end}}
     </div>
 {{end}}

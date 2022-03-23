@@ -21,3 +21,16 @@ func (app *application) clientError(w http.ResponseWriter, status int, err *mode
 	}
 	http.Error(w, http.StatusText(status), status)
 }
+
+func (app *application) render(w http.ResponseWriter, name string, td *templateData){
+	// retrieve appropriate template from cache
+	ts, ok := app.templateCache[name]
+	if !ok {
+		app.serverError(w, fmt.Errorf("template %s not found", name))
+		return
+	}
+	err := ts.Execute(w, td)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}

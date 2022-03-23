@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -19,28 +18,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"ui/html/home.page.tmpl",
-		"ui/html/show.snippets.tmpl",
-		"ui/html/snippet.tmpl",
-		"ui/html/no-snippets.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partial.tmpl",
-	}
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
 	snippets, _ := app.snippets.Latest()
-	data := SnippetsData{
+	data := &templateData{
 		Snippets: snippets,
 	}
-	if err = tmpl.Execute(w, data); err != nil {
-		app.serverError(w, err)
-		return
-	}
+	app.render(w, "home.page.tmpl", data)
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -49,17 +31,6 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest, &models.ClientError{
 			Message: "ID must be a positive integer",
 		})
-		return
-	}
-	files := []string{
-		"ui/html/show.snippet.tmpl",
-		"ui/html/snippet.tmpl",
-		"ui/html/base.layout.tmpl",
-		"ui/html/footer.partial.tmpl",
-	}
-	tmpl, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
 		return
 	}
 
@@ -76,13 +47,10 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	data := SnippetData{
+	data := &templateData{
 		Snippet: snippet,
 	}
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, "snippet.details.page.tmpl", data)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {

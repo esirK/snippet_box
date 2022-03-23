@@ -34,9 +34,15 @@ func main() {
 		DB: db,
 	}
 
+	templateCache, err := newTemplateCache("ui/html/")
+	if err != nil {
+		loggers.errorLogger.Fatal(err)
+	}
+
 	application := &application{
 		loggers:  &loggers,
 		snippets: &snippetModel,
+		templateCache: templateCache,
 	}
 
 	// Parse configurations for the application
