@@ -10,6 +10,7 @@ import (
 type loggers struct {
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
+	netLogger   *log.Logger
 }
 
 type application struct {

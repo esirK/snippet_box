@@ -26,8 +26,9 @@ func main() {
 	defer db.Close()
 	// Establish dependencies for handlers
 	loggers := loggers{
-		infoLogger:  InfoLogger,
-		errorLogger: ErrorLogger,
+		infoLogger:  	InfoLogger,
+		errorLogger: 	ErrorLogger,
+		netLogger:		NetLogger,
 	}
 
 	snippetModel := mysql.SnippetModel{
