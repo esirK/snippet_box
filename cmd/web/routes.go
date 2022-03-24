@@ -1,14 +1,19 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/go-chi/chi"
+)
 
 func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
+	router := chi.NewRouter()
+	router.Get("/", app.home)
+	router.Get("/snippets", app.home)
+	router.Post("/snippets", app.createSnippet)
+	router.Get("/snippets/{id}", app.showSnippet)
+	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet", app.showSnippet)
-	mux.HandleFunc("/snippet/create", app.createSnippet)
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-
-	return app.recoverPanic(app.logRequest(secureHeaders(mux)))
+	return app.recoverPanic(app.logRequest(secureHeaders(router)))
 }

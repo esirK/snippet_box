@@ -8,16 +8,12 @@ import (
 	"strconv"
 
 	"github.com/esirk/snippet_box/pkg/models"
+	"github.com/go-chi/chi"
 )
 
 var fileServer = http.FileServer(http.Dir("./ui/static"))
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		app.clientError(w, http.StatusNotFound, nil)
-		return
-	}
-
 	snippets, _ := app.snippets.Latest()
 	data := &templateData{
 		Snippets: snippets,
@@ -26,7 +22,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
 		app.clientError(w, http.StatusBadRequest, &models.ClientError{
 			Message: "ID must be a positive integer",
