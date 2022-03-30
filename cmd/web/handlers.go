@@ -49,14 +49,18 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	app.render(w, "snippet.details.page.tmpl", data)
 }
 
+func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request) {
+	app.render(w, "snippet.create.page.tmpl", &templateData{})
+}
+
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		// w.WriteHeader(http.StatusMethodNotAllowed)
-		// w.Write([]byte("Method not allowed"))
-		app.clientError(w, http.StatusMethodNotAllowed, nil)
-		return
-	}
+	// if r.Method != http.MethodPost {
+	// 	w.Header().Set("Allow", http.MethodPost)
+	// 	// w.WriteHeader(http.StatusMethodNotAllowed)
+	// 	// w.Write([]byte("Method not allowed"))
+	// 	app.clientError(w, http.StatusMethodNotAllowed, nil)
+	// 	return
+	// }
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		app.serverError(w, err)
@@ -73,5 +77,5 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// redirect to new snippet
-	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }

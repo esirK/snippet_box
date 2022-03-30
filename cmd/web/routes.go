@@ -11,7 +11,8 @@ func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
 	router.Get("/", app.home)
 	router.Get("/snippets", app.home)
-	router.Post("/snippets", app.createSnippet)
+	router.Post("/snippets/create", app.createSnippet)
+	router.Get("/snippets/create", app.createSnippetForm)
 	router.Get("/snippets/{id}", app.showSnippet)
 	router.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
