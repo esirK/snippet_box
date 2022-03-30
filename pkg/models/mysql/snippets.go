@@ -59,3 +59,12 @@ func (m *SnippetModel) Latest() ([]*models.Snippet, error) {
 
 	return snippets, nil
 }
+
+func (m *SnippetModel) Delete(id int) error {
+	stmt := "DELETE FROM snippets WHERE id = ?"
+	_, err := m.DB.Exec(stmt, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

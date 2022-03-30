@@ -77,5 +77,30 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// redirect to new snippet
-	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/snippets/%d", id), http.StatusSeeOther)
+}
+
+func (app *application) deleteSnippet(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil || id < 1 {
+		app.clientError(w, http.StatusBadRequest, &models.ClientError{
+			Message: "ID must be a positive integer",
+		})
+		return
+	}
+
+	if err := app.snippets.Delete(id); err != nil {
+		switch err.(type) {
+		case *models.ErrNoRecord:
+			app.clientError(w, http.StatusNotFound, &models.ClientError{
+				Message: "Snippet not found",
+			})
+			return
+		default:
+			app.serverError(w, err)
+		}
+		return
+	}
+	// redirect to home
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
